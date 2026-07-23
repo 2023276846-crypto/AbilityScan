@@ -1,0 +1,577 @@
+<template>
+  <div class="dashboard">
+    <!-- Sidebar -->
+    <PWDSidebar />
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <div class="topbar">
+        <div>
+          <h1>My Profile</h1>
+          <p>Manage your personal information and accessibility needs</p>
+        </div>
+        <button class="theme-toggle" @click="$emit('toggleTheme')">
+          {{ isDark ? '☀️ Light' : '🌙 Dark' }}
+        </button>
+      </div>
+
+      <div class="content-grid">
+
+        <!-- Left: Personal Info -->
+        <div class="card">
+          <h2>Personal Information</h2>
+
+          <div class="form-group">
+            <label>Full Name</label>
+            <input v-model="form.full_name" type="text"
+              placeholder="Enter full name" class="form-input"/>
+          </div>
+
+          <div class="form-group">
+            <label>OKU Number</label>
+            <input v-model="form.oku_number" type="text"
+              placeholder="Enter OKU number" class="form-input"/>
+          </div>
+
+          <div class="form-group">
+            <label>Email</label>
+            <input v-model="form.email" type="email"
+              placeholder="Enter email" class="form-input" disabled/>
+          </div>
+
+          <div class="form-group">
+            <label>Upload OKU Card</label>
+            <input type="file" @change="handleFile"
+              accept="image/*,.pdf" class="form-input file-input"/>
+            <div v-if="form.oku_card_path" class="file-status">
+              OKU Card uploaded
+              <a :href="'/storage/' + form.oku_card_path" target="_blank" class="view-link">View</a>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Upload Certificate</label>
+            <input type="file" @change="handleCertificate"
+              accept=".pdf,.jpg,.jpeg,.png" class="form-input file-input"/>
+            <p class="file-hint">Accepted format: PDF, JPG, PNG</p>
+            <div v-if="form.certificate_path" class="file-status">
+              Certificate uploaded
+              <a :href="'/storage/' + form.certificate_path" target="_blank" class="view-link">View</a>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Upload Skills Video</label>
+            <input type="file" @change="handleVideo"
+              accept="video/mp4,video/avi,video/mov" class="form-input file-input"/>
+            <p class="file-hint">Accepted format: MP4, AVI, MOV (max 50MB)</p>
+            <div v-if="form.video_path" class="file-status">
+              Video uploaded
+              <a :href="'/storage/' + form.video_path" target="_blank" class="view-link">View</a>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Account Status</label>
+            <div :class="['status-badge', form.status]">
+              {{ form.status === 'pending' ? 'Pending Approval' :
+                 form.status === 'approved' ? 'Approved' : 'Rejected' }}
+            </div>
+          </div>
+        </div>
+
+        <!-- Right: Skills & Rules -->
+        <div class="card">
+
+          <!-- S-Rule: Skills -->
+          <div class="rule-section">
+            <div class="rule-header s-rule">
+              <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: #1e40af; flex-shrink: 0;"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+              <div>
+                <h3>S-Rule: Skills</h3>
+                <p>Professional skills you have (Weight: 30%)</p>
+              </div>
+            </div>
+            <div class="checkbox-grid">
+              <label class="checkbox-item" v-for="skill in skillOptions" :key="skill">
+                <input type="checkbox" :value="skill" v-model="form.skills"/>
+                {{ skill }}
+              </label>
+            </div>
+          </div>
+
+          <!-- P-Rule: Physical Needs -->
+          <div class="rule-section">
+            <div class="rule-header p-rule">
+              <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: #166534; flex-shrink: 0;"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+              <div>
+                <h3>P-Rule: Physical Accessibility Needs</h3>
+                <p>Physical building accommodations you need (Weight: 25%)</p>
+              </div>
+            </div>
+            <div class="checkbox-grid">
+              <label class="checkbox-item" v-for="item in physicalOptions" :key="item">
+                <input type="checkbox" :value="item" v-model="form.physical_needs"/>
+                {{ item }}
+              </label>
+            </div>
+          </div>
+
+          <!-- T-Rule: Tech Needs -->
+          <div class="rule-section">
+            <div class="rule-header t-rule">
+              <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: #7e22ce; flex-shrink: 0;"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+              <div>
+                <h3>T-Rule: Technology Support Needs</h3>
+                <p>Digital assistive tools you need (Weight: 20%)</p>
+              </div>
+            </div>
+            <div class="checkbox-grid">
+              <label class="checkbox-item" v-for="item in techOptions" :key="item">
+                <input type="checkbox" :value="item" v-model="form.tech_needs"/>
+                {{ item }}
+              </label>
+            </div>
+          </div>
+
+          <!-- W-Rule: Work Arrangement -->
+          <div class="rule-section">
+            <div class="rule-header w-rule">
+              <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: #c2410c; flex-shrink: 0;"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              <div>
+                <h3>W-Rule: Work Arrangement Needs</h3>
+                <p>Work flexibility requirements (Weight: 15%)</p>
+              </div>
+            </div>
+            <div class="checkbox-grid">
+              <label class="checkbox-item" v-for="item in workOptions" :key="item">
+                <input type="checkbox" :value="item" v-model="form.work_arrangement"/>
+                {{ item }}
+              </label>
+            </div>
+          </div>
+
+          <!-- C-Rule: Sensory Needs -->
+          <div class="rule-section">
+            <div class="rule-header c-rule">
+              <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: #854d0e; flex-shrink: 0;"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+              <div>
+                <h3>C-Rule: Communication & Sensory Needs</h3>
+                <p>Communication support you need (Weight: 10%)</p>
+              </div>
+            </div>
+            <div class="checkbox-grid">
+              <label class="checkbox-item" v-for="item in sensoryOptions" :key="item">
+                <input type="checkbox" :value="item" v-model="form.sensory_needs"/>
+                {{ item }}
+              </label>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <p v-if="success" class="success-msg">{{ success }}</p>
+      <p v-if="error" class="error-msg">{{ error }}</p>
+
+      <div class="form-actions">
+        <button @click="saveProfile" class="btn-save" :disabled="loading">
+          {{ loading ? 'Saving...' : 'Save Profile' }}
+        </button>
+      </div>
+    </main>
+  </div>
+</template>
+
+<script>
+import axios from 'axios'
+
+export default {
+  name: 'ManageProfile',
+  props: { isDark: Boolean },
+  emits: ['toggleTheme'],
+  data() {
+    return {
+      form: {
+        full_name: '',
+        oku_number: '',
+        email: '',
+        oku_card_path: '',
+        oku_card: null,
+        certificate_path: '',
+        certificate: null,
+        video_path: '',
+        video: null,
+        skills: [],
+        physical_needs: [],
+        tech_needs: [],
+        work_arrangement: [],
+        sensory_needs: [],
+        accessibility_needs: [],
+        status: 'pending'
+      },
+      skillOptions: [
+        'Microsoft Office', 'Data Entry', 'Customer Service',
+        'Graphic Design', 'Web Development', 'Programming',
+        'Accounting', 'Marketing', 'Social Media',
+        'Video Editing', 'Content Writing', 'Translation',
+        'Teaching', 'Administrative', 'Logistics',
+      ],
+      physicalOptions: [
+        'Wheelchair Ramp', 'Elevator Access',
+        'Accessible Restroom', 'Parking for Disabled',
+        'Accessible Entrance', 'Lowered Reception Desk',
+      ],
+      techOptions: [
+        'Screen Reader Software', 'Braille Display',
+        'Voice Recognition Software', 'Adjustable Workstation',
+        'Large Monitor', 'Ergonomic Equipment',
+      ],
+      workOptions: [
+        'Flexible Working Hours', 'Remote Work',
+        'Part Time Work', 'Reduced Working Hours',
+        'Work From Home', 'Hybrid Work',
+      ],
+      sensoryOptions: [
+        'Sign Language Interpreter', 'Hearing Loop System',
+        'Quiet Work Environment', 'Written Communication',
+        'Visual Alerts', 'Braille Signage',
+      ],
+      success: '',
+      error: '',
+      loading: false
+    }
+  },
+  mounted() {
+    this.loadProfile()
+  },
+  methods: {
+    async loadProfile() {
+      try {
+        const token = localStorage.getItem('token')
+        if (!token) { this.$router.push('/login'); return }
+        axios.defaults.headers.common['Authorization'] = `Bearer ${token}`
+        const response = await axios.get('/api/pwd/profile')
+        if (response.data.profile) {
+          const p = response.data.profile
+          this.form.full_name = p.full_name || ''
+          this.form.oku_number = p.oku_number || ''
+          this.form.oku_card_path = p.oku_card_path || ''
+          this.form.certificate_path = p.certificate_path || ''
+          this.form.video_path = p.video_path || ''
+          this.form.skills = p.skills || []
+          this.form.physical_needs = p.physical_needs || []
+          this.form.tech_needs = p.tech_needs || []
+          this.form.work_arrangement = p.work_arrangement || []
+          this.form.sensory_needs = p.sensory_needs || []
+          this.form.accessibility_needs = p.accessibility_needs || []
+          this.form.status = p.status || 'pending'
+        }
+        if (response.data.user) {
+          this.form.email = response.data.user.email
+        }
+      } catch (err) {
+        console.log('Profile not loaded yet')
+      }
+    },
+    handleFile(event) {
+      this.form.oku_card = event.target.files[0]
+    },
+    handleCertificate(event) {
+      this.form.certificate = event.target.files[0]
+    },
+    handleVideo(event) {
+      this.form.video = event.target.files[0]
+    },
+    async saveProfile() {
+      this.loading = true
+      this.success = ''
+      this.error = ''
+      try {
+        const formData = new FormData()
+        formData.append('full_name', this.form.full_name)
+        formData.append('oku_number', this.form.oku_number)
+        formData.append('skills', JSON.stringify(this.form.skills))
+        formData.append('physical_needs', JSON.stringify(this.form.physical_needs))
+        formData.append('tech_needs', JSON.stringify(this.form.tech_needs))
+        formData.append('work_arrangement', JSON.stringify(this.form.work_arrangement))
+        formData.append('sensory_needs', JSON.stringify(this.form.sensory_needs))
+        formData.append('accessibility_needs', JSON.stringify([
+          ...this.form.physical_needs,
+          ...this.form.tech_needs,
+          ...this.form.work_arrangement,
+          ...this.form.sensory_needs
+        ]))
+        if (this.form.oku_card) formData.append('oku_card', this.form.oku_card)
+        if (this.form.certificate) formData.append('certificate', this.form.certificate)
+        if (this.form.video) formData.append('video', this.form.video)
+
+        await axios.post('/api/pwd/profile', formData, {
+          headers: { 'Content-Type': 'multipart/form-data' }
+        })
+        this.success = 'Profile saved successfully!'
+      } catch (err) {
+        this.error = 'Failed to save profile. Please try again.'
+      }
+      this.loading = false
+    },
+    async handleLogout() {
+      try { await axios.post('/api/logout') } catch (err) {}
+      localStorage.removeItem('token')
+      localStorage.removeItem('role')
+      this.$router.push('/login')
+    }
+  }
+}
+</script>
+
+<style scoped>
+.dashboard {
+  display: flex;
+  min-height: 100vh;
+  background: var(--bg);
+}
+
+.sidebar {
+  width: 240px;
+  background: var(--surface);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  padding: 24px 16px;
+  position: fixed;
+  height: 100vh;
+  z-index: 50;
+}
+
+.sidebar-logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--primary);
+  margin-bottom: 32px;
+  padding: 0 8px;
+}
+
+.sidebar-nav { display: flex; flex-direction: column; gap: 4px; flex: 1; }
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  border-radius: 10px;
+  color: var(--text-muted);
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.nav-item:hover { background: var(--primary-light); color: var(--primary); }
+.nav-item.active { background: var(--primary); color: white; }
+
+.btn-logout {
+  padding: 12px 16px;
+  background: #fef2f2;
+  color: #ef4444;
+  border: 1px solid #fecaca;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-align: left;
+}
+
+.btn-logout:hover { background: #ef4444; color: white; }
+
+.main-content { margin-left: 240px; flex: 1; padding: 32px; }
+
+.topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 24px;
+}
+
+.topbar h1 { font-size: 24px; font-weight: 700; color: var(--text); margin-bottom: 4px; }
+.topbar p { font-size: 14px; color: var(--text-muted); }
+
+.theme-toggle {
+  padding: 8px 16px;
+  border: 2px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface);
+  color: var(--text);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.theme-toggle:hover { border-color: var(--primary); color: var(--primary); }
+
+.content-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  margin-bottom: 24px;
+}
+
+.card {
+  background: var(--surface);
+  border-radius: 16px;
+  padding: 24px;
+  border: 1px solid var(--border);
+  box-shadow: var(--card-shadow);
+}
+
+.card h2 {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 16px;
+}
+
+.form-group { margin-bottom: 16px; }
+
+.form-group label {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 6px;
+}
+
+.form-input {
+  width: 100%;
+  padding: 10px 14px;
+  border: 2px solid var(--border);
+  border-radius: 8px;
+  font-size: 14px;
+  color: var(--text);
+  background: var(--input-bg);
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.form-input:focus { border-color: var(--primary); }
+.form-input:disabled { opacity: 0.6; cursor: not-allowed; }
+.file-input { padding: 8px; cursor: pointer; }
+
+.file-hint { font-size: 11px; color: var(--text-muted); margin-top: 4px; }
+
+.file-status {
+  font-size: 12px;
+  color: #10b981;
+  margin-top: 4px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.view-link { color: var(--primary); text-decoration: underline; font-size: 12px; }
+
+.status-badge {
+  display: inline-block;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.status-badge.pending { background: #fef9c3; color: #854d0e; }
+.status-badge.approved { background: #f0fdf4; color: #166534; }
+.status-badge.rejected { background: #fef2f2; color: #991b1b; }
+
+/* Rule Sections */
+.rule-section { margin-bottom: 24px; }
+
+.rule-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  border-radius: 10px;
+  margin-bottom: 12px;
+}
+
+.rule-header span { font-size: 24px; flex-shrink: 0; }
+.rule-header h3 { font-size: 14px; font-weight: 700; color: var(--text); margin-bottom: 2px; }
+.rule-header p { font-size: 12px; color: var(--text-muted); }
+
+.s-rule { background: #eff6ff; border: 1px solid #bfdbfe; }
+.p-rule { background: #f0fdf4; border: 1px solid #bbf7d0; }
+.t-rule { background: #faf5ff; border: 1px solid #e9d5ff; }
+.w-rule { background: #fff7ed; border: 1px solid #fed7aa; }
+.c-rule { background: #fef9c3; border: 1px solid #fde047; }
+
+.checkbox-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.checkbox-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--text);
+  cursor: pointer;
+  padding: 6px 10px;
+  border-radius: 6px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  transition: all 0.2s;
+}
+
+.checkbox-item:hover { border-color: var(--primary); color: var(--primary); }
+.checkbox-item input { accent-color: var(--primary); }
+
+.success-msg {
+  color: #10b981;
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  border-radius: 8px;
+  padding: 10px 16px;
+  font-size: 13px;
+  margin-bottom: 16px;
+}
+
+.error-msg {
+  color: #ef4444;
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: 8px;
+  padding: 10px 16px;
+  font-size: 13px;
+  margin-bottom: 16px;
+}
+
+.form-actions { display: flex; justify-content: flex-end; }
+
+.btn-save {
+  padding: 12px 32px;
+  background: var(--primary);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.btn-save:hover { background: var(--primary-hover); }
+.btn-save:disabled { opacity: 0.6; cursor: not-allowed; }
+
+@media (max-width: 768px) {
+  .sidebar { display: none; }
+  .main-content { margin-left: 0; }
+  .content-grid { grid-template-columns: 1fr; }
+}
+</style>
