@@ -358,10 +358,8 @@ export default {
           return;
         }
         const reader = new FileReader();
-        reader.readAsDataURL(file);
         reader.onload = (event) => {
           const img = new Image();
-          img.src = event.target.result;
           img.onload = () => {
             const canvas = document.createElement('canvas');
             let width = img.width;
@@ -397,8 +395,10 @@ export default {
             }, 'image/jpeg', quality);
           };
           img.onerror = () => resolve(file);
+          img.src = event.target.result;
         };
         reader.onerror = () => resolve(file);
+        reader.readAsDataURL(file);
       });
     },
     async saveProfile() {
