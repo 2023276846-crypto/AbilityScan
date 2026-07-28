@@ -104,7 +104,10 @@
               <td>{{ emp.id }}</td>
               <td>
                 <div class="table-name">
-                  <div class="table-avatar">{{ getInitials(emp.company_name) }}</div>
+                  <div class="table-avatar">
+                    <img v-if="emp.logo_path" :src="'/storage/' + emp.logo_path" />
+                    <span v-else>{{ getInitials(emp.company_name) }}</span>
+                  </div>
                   <div>
                     <div>{{ emp.company_name }}</div>
                     <div class="table-sub">{{ emp.contact_number }}</div>
@@ -449,6 +452,7 @@ export default {
 
 .table-name { display: flex; align-items: center; gap: 8px; font-weight: 600; }
 .table-avatar { width: 32px; height: 32px; border-radius: 50%; background: var(--primary); color: white; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; flex-shrink: 0; }
+.table-avatar img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
 .table-sub { font-size: 11px; color: var(--text-muted); font-weight: 400; }
 
 .tags { display: flex; flex-wrap: wrap; gap: 4px; }

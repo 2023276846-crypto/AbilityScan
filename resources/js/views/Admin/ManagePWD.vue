@@ -90,7 +90,10 @@
               <td>{{ pwd.id }}</td>
               <td>
                 <div class="table-name">
-                  <div class="table-avatar">{{ getInitials(pwd.full_name) }}</div>
+                  <div class="table-avatar">
+                    <img v-if="pwd.avatar_path" :src="'/storage/' + pwd.avatar_path" />
+                    <span v-else>{{ getInitials(pwd.full_name) }}</span>
+                  </div>
                   {{ pwd.full_name }}
                 </div>
               </td>
@@ -137,7 +140,10 @@
       <div class="modal">
         <div class="modal-header">
           <div class="modal-profile">
-            <div class="modal-avatar">{{ getInitials(selectedPWD.full_name) }}</div>
+            <div class="modal-avatar">
+              <img v-if="selectedPWD.avatar_path" :src="'/storage/' + selectedPWD.avatar_path" />
+              <span v-else>{{ getInitials(selectedPWD.full_name) }}</span>
+            </div>
             <div>
               <h2>{{ selectedPWD.full_name }}</h2>
               <p>{{ selectedPWD.user?.email }}</p>
@@ -399,6 +405,7 @@ export default {
 .table-name { display: flex; align-items: center; gap: 8px; font-weight: 600; }
 
 .table-avatar { width: 32px; height: 32px; border-radius: 50%; background: var(--primary); color: white; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; flex-shrink: 0; }
+.table-avatar img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
 
 .tags { display: flex; flex-wrap: wrap; gap: 4px; }
 
@@ -429,7 +436,8 @@ export default {
 .modal-header { display: flex; justify-content: space-between; align-items: flex-start; padding: 24px; border-bottom: 1px solid var(--border); }
 .modal-profile { display: flex; align-items: center; gap: 16px; }
 
-.modal-avatar { width: 56px; height: 56px; border-radius: 50%; background: var(--primary); color: white; display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: 700; }
+.modal-avatar { width: 56px; height: 56px; border-radius: 50%; background: var(--primary); color: white; display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: 700; overflow: hidden; }
+.modal-avatar img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
 
 .modal-header h2 { font-size: 18px; font-weight: 700; color: var(--text); margin-bottom: 4px; }
 .modal-header p { font-size: 13px; color: var(--text-muted); margin-bottom: 2px; }
