@@ -503,11 +503,17 @@ export default {
 
             canvas.toBlob((blob) => {
               if (blob) {
-                const compressedFile = new File([blob], file.name, {
-                  type: 'image/jpeg',
-                  lastModified: Date.now()
-                });
-                resolve(compressedFile);
+                try {
+                  const compressedFile = new File([blob], file.name, {
+                    type: 'image/jpeg',
+                    lastModified: Date.now()
+                  });
+                  resolve(compressedFile);
+                } catch (e) {
+                  // Fallback for older browsers/WebViews that don't support new File()
+                  blob.name = file.name;
+                  resolve(blob);
+                }
               } else {
                 resolve(file);
               }
@@ -566,8 +572,8 @@ export default {
           profilePictureFile = await this.compressImage(profilePictureFile);
         }
 
-        if (okuCardFile) formData.append('oku_card', okuCardFile)
-        if (profilePictureFile) formData.append('profile_picture', profilePictureFile)
+        if (okuCardFile) formData.append('oku_card', okuCardFile, okuCardFile.name || 'oku_card.jpg')
+        if (profilePictureFile) formData.append('profile_picture', profilePictureFile, profilePictureFile.name || 'profile_picture.jpg')
 
         await axios.post('/api/pwd/profile', formData)
         this.success = 'Profile saved successfully!'

@@ -384,11 +384,17 @@ export default {
 
             canvas.toBlob((blob) => {
               if (blob) {
-                const compressedFile = new File([blob], file.name, {
-                  type: 'image/jpeg',
-                  lastModified: Date.now()
-                });
-                resolve(compressedFile);
+                try {
+                  const compressedFile = new File([blob], file.name, {
+                    type: 'image/jpeg',
+                    lastModified: Date.now()
+                  });
+                  resolve(compressedFile);
+                } catch (e) {
+                  // Fallback for older browsers/WebViews that don't support new File()
+                  blob.name = file.name;
+                  resolve(blob);
+                }
               } else {
                 resolve(file);
               }
@@ -431,7 +437,7 @@ export default {
         }
 
         if (logoFile) {
-          formData.append('logo', logoFile)
+          formData.append('logo', logoFile, logoFile.name || 'logo.jpg')
         }
 
         await axios.post('/api/employer/profile', formData)

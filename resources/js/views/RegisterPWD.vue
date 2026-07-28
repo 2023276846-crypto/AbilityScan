@@ -157,11 +157,17 @@ export default {
 
             canvas.toBlob((blob) => {
               if (blob) {
-                const compressedFile = new File([blob], file.name, {
-                  type: 'image/jpeg',
-                  lastModified: Date.now()
-                });
-                resolve(compressedFile);
+                try {
+                  const compressedFile = new File([blob], file.name, {
+                    type: 'image/jpeg',
+                    lastModified: Date.now()
+                  });
+                  resolve(compressedFile);
+                } catch (e) {
+                  // Fallback for older browsers/WebViews that don't support new File()
+                  blob.name = file.name;
+                  resolve(blob);
+                }
               } else {
                 resolve(file);
               }
@@ -202,7 +208,7 @@ export default {
         }
 
         if (okuCardFile) {
-          formData.append('oku_card', okuCardFile)
+          formData.append('oku_card', okuCardFile, okuCardFile.name || 'oku_card.jpg')
         }
 
         const response = await axios.post('/api/register/pwd', formData)
