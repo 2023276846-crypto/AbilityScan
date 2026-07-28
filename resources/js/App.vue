@@ -198,14 +198,39 @@ body {
   z-index: 9998;
 }
 
-@media (max-width: 768px) {
+@media (max-width: 1024px) {
   .mobile-hamburger {
-    display: flex;
+    display: flex !important;
+  }
+  
+  /* Hide sidebar globally on mobile/tablet by default when menu is closed */
+  .sidebar {
+    display: none !important;
+  }
+
+  body.mobile-menu-open .sidebar {
+    display: flex !important;
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    height: 100vh !important;
+    width: 260px !important;
+    z-index: 9999 !important;
+    background: var(--surface) !important;
+    box-shadow: 2px 0 15px rgba(0,0,0,0.5) !important;
+    transform: translateX(0) !important;
+    transition: transform 0.3s ease !important;
+  }
+
+  .main-content {
+    margin-left: 0 !important;
+    padding-left: 20px !important;
+    padding-right: 20px !important;
   }
   
   /* Adjust main-content padding to not overlap with the hamburger button */
   .main-content .topbar {
-    padding-left: 56px; /* Push content to the right of the hamburger */
+    padding-left: 56px !important; /* Push content to the right of the hamburger */
   }
 
   /* When menu is open, show overlay and sidebar */
@@ -214,21 +239,7 @@ body {
   }
 
   body.mobile-menu-open .mobile-overlay {
-    display: block;
-  }
-
-  body.mobile-menu-open .sidebar {
-    display: flex !important; /* Override the display: none in child components */
-    position: fixed;
-    top: 0;
-    left: 0;
-    height: 100vh;
-    width: 260px;
-    z-index: 9999;
-    background: var(--surface);
-    box-shadow: 2px 0 15px rgba(0,0,0,0.5);
-    transform: translateX(0);
-    transition: transform 0.3s ease;
+    display: block !important;
   }
 }
 

@@ -351,6 +351,56 @@ export default {
         reader.readAsDataURL(file)
       }
     },
+    compressImage(file, maxWidth = 1000, maxHeight = 1000, quality = 0.8) {
+      return new Promise((resolve) => {
+        if (!file || !file.type.startsWith('image/')) {
+          resolve(file);
+          return;
+        }
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = (event) => {
+          const img = new Image();
+          img.src = event.target.result;
+          img.onload = () => {
+            const canvas = document.createElement('canvas');
+            let width = img.width;
+            let height = img.height;
+
+            if (width > height) {
+              if (width > maxWidth) {
+                height = Math.round((height * maxWidth) / width);
+                width = maxWidth;
+              }
+            } else {
+              if (height > maxHeight) {
+                width = Math.round((width * maxHeight) / height);
+                height = maxHeight;
+              }
+            }
+
+            canvas.width = width;
+            canvas.height = height;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, width, height);
+
+            canvas.toBlob((blob) => {
+              if (blob) {
+                const compressedFile = new File([blob], file.name, {
+                  type: 'image/jpeg',
+                  lastModified: Date.now()
+                });
+                resolve(compressedFile);
+              } else {
+                resolve(file);
+              }
+            }, 'image/jpeg', quality);
+          };
+          img.onerror = () => resolve(file);
+        };
+        reader.onerror = () => resolve(file);
+      });
+    },
     async saveProfile() {
       this.loading = true
       this.success = ''
@@ -375,13 +425,16 @@ export default {
         formData.append('accessibility', JSON.stringify(combinedAccessibility))
         formData.append('about_us', this.form.about_us || '')
 
-        if (this.form.logo) {
-          formData.append('logo', this.form.logo)
+        let logoFile = this.form.logo;
+        if (logoFile) {
+          logoFile = await this.compressImage(logoFile);
         }
 
-        await axios.post('/api/employer/profile', formData, {
-          headers: { 'Content-Type': 'multipart/form-data' }
-        })
+        if (logoFile) {
+          formData.append('logo', logoFile)
+        }
+
+        await axios.post('/api/employer/profile', formData)
         this.success = 'Profile saved successfully!'
         this.logoPreview = null
         this.loadProfile()
