@@ -155,7 +155,8 @@
       <div class="modal">
         <div class="modal-header">
           <div class="modal-profile">
-            <div class="modal-avatar">{{ getInitials(selectedEmployer.company_name) }}</div>
+            <img v-if="selectedEmployer.logo_path" :src="'/storage/' + selectedEmployer.logo_path" class="modal-logo-img" />
+            <div v-else class="modal-avatar">{{ getInitials(selectedEmployer.company_name) }}</div>
             <div>
               <h2>{{ selectedEmployer.company_name }}</h2>
               <p>{{ selectedEmployer.company_email }}</p>
@@ -169,6 +170,17 @@
         </div>
 
         <div class="modal-body">
+
+          <!-- About Us -->
+          <div class="modal-section" v-if="selectedEmployer.about_us">
+            <div class="section-title" style="display: flex; align-items: center; gap: 6px;">
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--primary);"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+              About Us
+            </div>
+            <div style="font-size: 13px; color: var(--text); line-height: 1.5; white-space: pre-line;">
+              {{ selectedEmployer.about_us }}
+            </div>
+          </div>
 
           <!-- Company Details -->
           <div class="modal-section">
@@ -466,6 +478,7 @@ export default {
 
 .modal-header { display: flex; justify-content: space-between; align-items: flex-start; padding: 24px; border-bottom: 1px solid var(--border); }
 .modal-profile { display: flex; align-items: center; gap: 16px; }
+.modal-logo-img { width: 56px; height: 56px; border-radius: 12px; object-fit: cover; border: 1px solid var(--border); }
 .modal-avatar { width: 56px; height: 56px; border-radius: 50%; background: var(--primary); color: white; display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: 700; }
 .modal-header h2 { font-size: 18px; font-weight: 700; color: var(--text); margin-bottom: 4px; }
 .modal-header p { font-size: 13px; color: var(--text-muted); margin-bottom: 2px; }

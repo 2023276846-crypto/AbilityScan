@@ -283,6 +283,26 @@
               </span>
             </div>
           </div>
+
+          <!-- Company Profile Section -->
+          <div class="modal-section company-profile-section" v-if="selectedJob.employer">
+            <h4 style="display: flex; align-items: center; gap: 8px;">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--primary);"><rect x="4" y="2" width="16" height="20" rx="2" ry="2"/><line x1="9" y1="22" x2="9" y2="16"/><line x1="15" y1="22" x2="15" y2="16"/></svg>
+              About {{ selectedJob.employer.company_name }}
+            </h4>
+            <div class="company-card-brief">
+              <img v-if="selectedJob.employer.logo_path" :src="'/storage/' + selectedJob.employer.logo_path" class="company-card-logo" />
+              <div v-else class="company-card-initials">{{ getInitials(selectedJob.employer.company_name) }}</div>
+              <div class="company-card-meta">
+                <span v-if="selectedJob.employer.industry_type" class="company-meta-badge">🏢 {{ selectedJob.employer.industry_type }}</span>
+                <span v-if="selectedJob.employer.company_email" class="company-meta-badge">✉️ {{ selectedJob.employer.company_email }}</span>
+                <span v-if="selectedJob.employer.company_address" class="company-meta-address">📍 {{ selectedJob.employer.company_address }}</span>
+              </div>
+            </div>
+            <p v-if="selectedJob.employer.about_us" class="company-about-desc">
+              {{ selectedJob.employer.about_us }}
+            </p>
+          </div>
         </div>
 
         <div class="modal-footer">
@@ -402,6 +422,10 @@ export default {
       localStorage.removeItem('token')
       localStorage.removeItem('role')
       this.$router.push('/login')
+    },
+    getInitials(name) {
+      if (!name) return '?'
+      return name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)
     }
   }
 }
@@ -580,5 +604,62 @@ export default {
 .btn-contact-modal-job:hover {
   background: var(--primary);
   color: white;
+}
+
+/* Company profile styling inside job details modal */
+.company-profile-section {
+  border-top: 1px solid var(--border);
+  padding-top: 16px;
+  margin-top: 16px;
+}
+.company-card-brief {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 12px;
+  background: var(--bg);
+  padding: 12px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+}
+.company-card-logo {
+  width: 50px;
+  height: 50px;
+  border-radius: 10px;
+  object-fit: cover;
+  border: 1px solid var(--border);
+}
+.company-card-initials {
+  width: 50px;
+  height: 50px;
+  border-radius: 10px;
+  background: var(--primary);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  font-weight: 700;
+}
+.company-card-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.company-meta-badge {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+.company-meta-address {
+  font-size: 11px;
+  color: var(--text-muted);
+  word-break: break-all;
+}
+.company-about-desc {
+  font-size: 13px !important;
+  color: var(--text) !important;
+  line-height: 1.5 !important;
+  white-space: pre-line;
 }
 </style>

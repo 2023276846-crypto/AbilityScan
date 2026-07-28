@@ -216,7 +216,11 @@ class EmployerController extends Controller
     {
         $user = $request->user();
 
-        EmployerProfile::updateOrCreate(
+        $accessibility = is_array($request->accessibility) 
+            ? $request->accessibility 
+            : json_decode($request->accessibility ?? '[]', true);
+
+        $profile = EmployerProfile::updateOrCreate(
             ['user_id' => $user->id],
             [
                 'company_name'    => $request->company_name,
@@ -225,13 +229,23 @@ class EmployerController extends Controller
                 'ssm_number'      => $request->ssm_number,
                 'industry_type'   => $request->industry_type,
                 'company_address' => $request->company_address,
-                'accessibility'   => $request->accessibility ?? [],
+                'accessibility'   => $accessibility,
+                'about_us'        => $request->about_us,
             ]
         );
 
+        // Handle company logo upload
+        if ($request->hasFile('logo')) {
+            $path = $request->file('logo')->store('company_logos', 'public');
+            $profile->update(['logo_path' => $path]);
+        }
+
         $user->update(['name' => $request->name]);
 
-        return response()->json(['message' => 'Profile saved successfully']);
+        return response()->json([
+            'message' => 'Profile saved successfully',
+            'profile' => $profile
+        ]);
     }
 
     public function getCandidates(Request $request)
@@ -258,6 +272,13 @@ class EmployerController extends Controller
                     'certificate_path'   => $p->certificate_path,
                     'video_path'         => $p->video_path,
                     'status'             => $p->status,
+                    'avatar_path'        => $p->avatar_path,
+                    'location'           => $p->location,
+                    'about_me'           => $p->about_me,
+                    'experience'         => $p->experience,
+                    'education'          => $p->education ?? [],
+                    'certificates'       => $p->certificates ?? [],
+                    'videos'             => $p->videos ?? [],
                 ];
             });
 

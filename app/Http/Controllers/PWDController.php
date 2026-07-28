@@ -33,8 +33,18 @@ class PWDController extends Controller
                 'work_arrangement' => json_decode($request->work_arrangement ?? '[]', true),
                 'sensory_needs' => json_decode($request->sensory_needs ?? '[]', true),
                 'accessibility_needs' => json_decode($request->accessibility_needs ?? '[]', true),
+                'location' => $request->location,
+                'about_me' => $request->about_me,
+                'experience' => $request->experience,
+                'education' => json_decode($request->education ?? '[]', true),
             ]
         );
+
+        // Handle profile picture upload
+        if ($request->hasFile('profile_picture')) {
+            $path = $request->file('profile_picture')->store('profile_pictures', 'public');
+            $profile->update(['avatar_path' => $path]);
+        }
 
         // Handle OKU card upload
         if ($request->hasFile('oku_card')) {
@@ -42,17 +52,54 @@ class PWDController extends Controller
             $profile->update(['oku_card_path' => $path]);
         }
 
-        // Handle certificate upload
+        // Handle multiple certificates upload
+        $existingCertificates = json_decode($request->existing_certificates ?? '[]', true);
+        $certificates = $existingCertificates;
+        if ($request->hasFile('new_certificates')) {
+            foreach ($request->file('new_certificates') as $file) {
+                $path = $file->store('certificates', 'public');
+                $certificates[] = [
+                    'name' => $file->getClientOriginalName(),
+                    'path' => $path
+                ];
+            }
+        }
+        // Handle legacy single certificate upload
         if ($request->hasFile('certificate')) {
             $path = $request->file('certificate')->store('certificates', 'public');
-            $profile->update(['certificate_path' => $path]);
+            $certificates[] = [
+                'name' => $request->file('certificate')->getClientOriginalName(),
+                'path' => $path
+            ];
         }
 
-        // Handle video upload
+        // Handle multiple videos upload
+        $existingVideos = json_decode($request->existing_videos ?? '[]', true);
+        $videos = $existingVideos;
+        if ($request->hasFile('new_videos')) {
+            foreach ($request->file('new_videos') as $file) {
+                $path = $file->store('videos', 'public');
+                $videos[] = [
+                    'name' => $file->getClientOriginalName(),
+                    'path' => $path
+                ];
+            }
+        }
+        // Handle legacy single video upload
         if ($request->hasFile('video')) {
             $path = $request->file('video')->store('videos', 'public');
-            $profile->update(['video_path' => $path]);
+            $videos[] = [
+                'name' => $request->file('video')->getClientOriginalName(),
+                'path' => $path
+            ];
         }
+
+        $profile->update([
+            'certificates' => $certificates,
+            'videos' => $videos,
+            'certificate_path' => isset($certificates[0]) ? $certificates[0]['path'] : null,
+            'video_path' => isset($videos[0]) ? $videos[0]['path'] : null,
+        ]);
 
         return response()->json([
             'message' => 'Profile saved successfully',
@@ -154,6 +201,13 @@ class PWDController extends Controller
             'video_path'       => $profile->video_path,
             'status'           => $profile->status,
             'email'            => $user->email ?? '',
+            'avatar_path'      => $profile->avatar_path,
+            'location'         => $profile->location,
+            'about_me'         => $profile->about_me,
+            'experience'       => $profile->experience,
+            'education'        => $profile->education ?? [],
+            'certificates'     => $profile->certificates ?? [],
+            'videos'           => $profile->videos ?? [],
         ]
     ]);
 }
@@ -532,6 +586,13 @@ class PWDController extends Controller
             'video_path'       => $profile->video_path,
             'status'           => $profile->status,
             'email'            => $user->email ?? '',
+            'avatar_path'      => $profile->avatar_path,
+            'location'         => $profile->location,
+            'about_me'         => $profile->about_me,
+            'experience'       => $profile->experience,
+            'education'        => $profile->education ?? [],
+            'certificates'     => $profile->certificates ?? [],
+            'videos'           => $profile->videos ?? [],
         ]
     ]);
 }

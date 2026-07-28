@@ -89,9 +89,11 @@
         <div v-for="candidate in filteredCandidates" :key="candidate.id" class="candidate-card">
           <!-- Header -->
           <div class="candidate-header">
-            <div class="candidate-avatar">{{ getInitials(candidate.full_name) }}</div>
+            <img v-if="candidate.avatar_path" :src="'/storage/' + candidate.avatar_path" class="candidate-avatar-img" />
+            <div v-else class="candidate-avatar">{{ getInitials(candidate.full_name) }}</div>
             <div class="candidate-info">
               <h3>{{ candidate.full_name }}</h3>
+              <p v-if="candidate.location" class="candidate-location">📍 {{ candidate.location }}</p>
               <p>OKU No: {{ candidate.oku_number }}</p>
               <div :class="['candidate-status', candidate.status]">
                 {{ candidate.status }}
@@ -192,19 +194,31 @@
 
           <!-- Attachments -->
           <div class="candidate-attachments"
-            v-if="candidate.certificate_path || candidate.video_path">
-            <a v-if="candidate.certificate_path"
-              :href="'/storage/' + candidate.certificate_path"
-              target="_blank" class="attachment-badge" style="display: flex; align-items: center; gap: 4px;">
-              <svg viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
-              Certificate
-            </a>
-            <a v-if="candidate.video_path"
-              :href="'/storage/' + candidate.video_path"
-              target="_blank" class="attachment-badge" style="display: flex; align-items: center; gap: 4px;">
-              <svg viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 7a2 2 0 0 0-2.45-1.45L16 7V5a2 2 0 0 0-2-2H2a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2l4.55 1.45A2 2 0 0 0 23 17V7z"/></svg>
-              Video
-            </a>
+            v-if="(candidate.certificates && candidate.certificates.length) || (candidate.videos && candidate.videos.length)">
+            <!-- Certificates -->
+            <template v-if="candidate.certificates && candidate.certificates.length">
+              <a v-for="(cert, idx) in candidate.certificates.slice(0, 2)" :key="'c-' + idx"
+                :href="'/storage/' + cert.path"
+                target="_blank" class="attachment-badge" style="display: flex; align-items: center; gap: 4px;">
+                <svg viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+                Cert
+              </a>
+              <span v-if="candidate.certificates.length > 2" class="tag-more">
+                +{{ candidate.certificates.length - 2 }}
+              </span>
+            </template>
+            <!-- Videos -->
+            <template v-if="candidate.videos && candidate.videos.length">
+              <a v-for="(vid, idx) in candidate.videos.slice(0, 1)" :key="'v-' + idx"
+                :href="'/storage/' + vid.path"
+                target="_blank" class="attachment-badge" style="display: flex; align-items: center; gap: 4px;">
+                <svg viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 7a2 2 0 0 0-2.45-1.45L16 7V5a2 2 0 0 0-2-2H2a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2l4.55 1.45A2 2 0 0 0 23 17V7z"/></svg>
+                Video
+              </a>
+              <span v-if="candidate.videos.length > 1" class="tag-more">
+                +{{ candidate.videos.length - 1 }}
+              </span>
+            </template>
           </div>
 
           <!-- Actions -->
@@ -227,9 +241,11 @@
       <div class="modal">
         <div class="modal-header">
           <div class="modal-profile">
-            <div class="modal-avatar">{{ getInitials(selectedCandidate.full_name) }}</div>
+            <img v-if="selectedCandidate.avatar_path" :src="'/storage/' + selectedCandidate.avatar_path" class="modal-avatar-img" />
+            <div v-else class="modal-avatar">{{ getInitials(selectedCandidate.full_name) }}</div>
             <div>
               <h2>{{ selectedCandidate.full_name }}</h2>
+              <p v-if="selectedCandidate.location" class="modal-location">📍 {{ selectedCandidate.location }}</p>
               <p>OKU No: {{ selectedCandidate.oku_number }}</p>
               <div :class="['candidate-status', selectedCandidate.status]">
                 {{ selectedCandidate.status }}
@@ -429,6 +445,33 @@
 
           <!-- Profile Tab Content (shown if activeTab is 'profile' or no job selected) -->
           <div v-else>
+            <!-- About Me -->
+            <div v-if="selectedCandidate.about_me" class="modal-profile-section-card">
+              <h4>About Me</h4>
+              <p class="modal-section-text">{{ selectedCandidate.about_me }}</p>
+            </div>
+
+            <!-- Education Timeline -->
+            <div v-if="selectedCandidate.education && selectedCandidate.education.length" class="modal-profile-section-card">
+              <h4>🎓 Education Background</h4>
+              <div class="edu-timeline">
+                <div v-for="(edu, idx) in selectedCandidate.education" :key="idx" class="edu-timeline-item">
+                  <div class="timeline-dot"></div>
+                  <div class="timeline-content">
+                    <span class="edu-level-badge">{{ edu.level }}</span>
+                    <h5>{{ edu.school_name }}</h5>
+                    <span class="edu-duration">{{ edu.years }}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Work Experience -->
+            <div v-if="selectedCandidate.experience" class="modal-profile-section-card">
+              <h4>💼 Work Experience</h4>
+              <p class="modal-section-text">{{ selectedCandidate.experience }}</p>
+            </div>
+
             <!-- S-Rule -->
             <div class="modal-section">
               <h4 class="rule-tag s-tag" style="display: flex; align-items: center; gap: 4px;">
@@ -496,24 +539,30 @@
 
             <!-- Attachments -->
             <div class="modal-section"
-              v-if="selectedCandidate.certificate_path || selectedCandidate.video_path">
+              v-if="(selectedCandidate.certificates && selectedCandidate.certificates.length) || (selectedCandidate.videos && selectedCandidate.videos.length)">
               <h4 style="display: flex; align-items: center; gap: 4px;">
                 <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
                 Attachments
               </h4>
               <div class="attachments">
-                <a v-if="selectedCandidate.certificate_path"
-                  :href="'/storage/' + selectedCandidate.certificate_path"
-                  target="_blank" class="attachment-link" style="display: flex; align-items: center; gap: 6px;">
-                  <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
-                  View Certificate
-                </a>
-                <a v-if="selectedCandidate.video_path"
-                  :href="'/storage/' + selectedCandidate.video_path"
-                  target="_blank" class="attachment-link" style="display: flex; align-items: center; gap: 6px;">
-                  <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 7a2 2 0 0 0-2.45-1.45L16 7V5a2 2 0 0 0-2-2H2a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2l4.55 1.45A2 2 0 0 0 23 17V7z"/></svg>
-                  View Skills Video
-                </a>
+                <!-- Certificates -->
+                <template v-if="selectedCandidate.certificates && selectedCandidate.certificates.length">
+                  <a v-for="(cert, idx) in selectedCandidate.certificates" :key="'mc-' + idx"
+                    :href="'/storage/' + cert.path"
+                    target="_blank" class="attachment-link" style="display: flex; align-items: center; gap: 6px;">
+                    <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+                    {{ cert.name || 'Certificate ' + (idx + 1) }}
+                  </a>
+                </template>
+                <!-- Videos -->
+                <template v-if="selectedCandidate.videos && selectedCandidate.videos.length">
+                  <a v-for="(vid, idx) in selectedCandidate.videos" :key="'mv-' + idx"
+                    :href="'/storage/' + vid.path"
+                    target="_blank" class="attachment-link" style="display: flex; align-items: center; gap: 6px;">
+                    <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 7a2 2 0 0 0-2.45-1.45L16 7V5a2 2 0 0 0-2-2H2a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2l4.55 1.45A2 2 0 0 0 23 17V7z"/></svg>
+                    {{ vid.name || 'Skills Video ' + (idx + 1) }}
+                  </a>
+                </template>
               </div>
             </div>
           </div>
@@ -1145,5 +1194,99 @@ export default {
   font-size: 10px;
   color: var(--text-muted);
   font-style: italic;
+}
+
+/* Candidate Avatar Image */
+.candidate-avatar-img {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1px solid var(--border);
+  flex-shrink: 0;
+}
+.candidate-location {
+  font-size: 11px !important;
+  color: var(--primary) !important;
+  font-weight: 600;
+  margin-bottom: 2px !important;
+}
+
+/* Modal Avatar & Location */
+.modal-avatar-img {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid var(--border);
+  flex-shrink: 0;
+}
+.modal-location {
+  font-size: 13px !important;
+  color: var(--primary) !important;
+  font-weight: 600;
+  margin-bottom: 4px !important;
+}
+
+/* Modal extra details cards */
+.modal-profile-section-card {
+  padding: 14px;
+  background: var(--bg);
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  margin-bottom: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.modal-profile-section-card h4 {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 2px;
+}
+.modal-section-text {
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--text);
+}
+.edu-timeline {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  position: relative;
+  padding-left: 8px;
+}
+.edu-timeline-item {
+  display: flex;
+  gap: 12px;
+}
+.timeline-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--primary);
+  margin-top: 4px;
+  flex-shrink: 0;
+}
+.timeline-content {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+.timeline-content h5 {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text);
+}
+.edu-level-badge {
+  font-size: 9px;
+  font-weight: 700;
+  color: var(--primary);
+  text-transform: uppercase;
+}
+.edu-duration {
+  font-size: 10px;
+  color: var(--text-muted);
 }
 </style>

@@ -101,14 +101,43 @@
           <div v-else class="profile-result">
             <!-- Header -->
             <div class="profile-header">
-              <div class="profile-avatar">{{ initials }}</div>
+              <img v-if="portfolio.avatar_path" :src="'/storage/' + portfolio.avatar_path" class="profile-avatar-img" />
+              <div v-else class="profile-avatar">{{ initials }}</div>
               <div>
                 <h3>{{ portfolio.full_name }}</h3>
+                <p v-if="portfolio.location" class="profile-location">📍 {{ portfolio.location }}</p>
                 <p>OKU No: {{ portfolio.oku_number }}</p>
                 <div :class="['profile-status', portfolio.status]">
                   {{ portfolio.status }}
                 </div>
               </div>
+            </div>
+
+            <!-- About Me -->
+            <div v-if="portfolio.about_me" class="profile-section-card">
+              <h4>About Me</h4>
+              <p class="section-text">{{ portfolio.about_me }}</p>
+            </div>
+
+            <!-- Education Timeline -->
+            <div v-if="portfolio.education && portfolio.education.length" class="profile-section-card">
+              <h4>🎓 Education Background</h4>
+              <div class="edu-timeline">
+                <div v-for="(edu, idx) in portfolio.education" :key="idx" class="edu-timeline-item">
+                  <div class="timeline-dot"></div>
+                  <div class="timeline-content">
+                    <span class="edu-level-badge">{{ edu.level }}</span>
+                    <h5>{{ edu.school_name }}</h5>
+                    <span class="edu-duration">{{ edu.years }}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Work Experience -->
+            <div v-if="portfolio.experience" class="profile-section-card">
+              <h4>💼 Work Experience</h4>
+              <p class="section-text">{{ portfolio.experience }}</p>
             </div>
 
             <!-- S-Rule: Skills -->
@@ -163,19 +192,25 @@
 
             <!-- Attachments -->
             <div class="profile-section"
-              v-if="portfolio.certificate_path || portfolio.video_path">
+              v-if="(portfolio.certificates && portfolio.certificates.length) || (portfolio.videos && portfolio.videos.length)">
               <h4>📎 Attachments</h4>
               <div class="attachments">
-                <a v-if="portfolio.certificate_path"
-                  :href="'/storage/' + portfolio.certificate_path"
-                  target="_blank" class="attachment-link">
-                  📄 View Certificate
-                </a>
-                <a v-if="portfolio.video_path"
-                  :href="'/storage/' + portfolio.video_path"
-                  target="_blank" class="attachment-link">
-                  🎥 View Skills Video
-                </a>
+                <!-- Certificates -->
+                <template v-if="portfolio.certificates && portfolio.certificates.length">
+                  <a v-for="(cert, idx) in portfolio.certificates" :key="'c-' + idx"
+                    :href="'/storage/' + cert.path"
+                    target="_blank" class="attachment-link">
+                    📄 {{ cert.name || 'Certificate ' + (idx + 1) }}
+                  </a>
+                </template>
+                <!-- Videos -->
+                <template v-if="portfolio.videos && portfolio.videos.length">
+                  <a v-for="(vid, idx) in portfolio.videos" :key="'v-' + idx"
+                    :href="'/storage/' + vid.path"
+                    target="_blank" class="attachment-link">
+                    🎥 {{ vid.name || 'Skills Video ' + (idx + 1) }}
+                  </a>
+                </template>
               </div>
             </div>
 
@@ -428,6 +463,8 @@ export default {
 .profile-result { display: flex; flex-direction: column; gap: 12px; }
 .profile-header { display: flex; align-items: center; gap: 16px; padding-bottom: 12px; border-bottom: 1px solid var(--border); }
 .profile-avatar { width: 56px; height: 56px; border-radius: 50%; background: var(--primary); color: white; display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: 700; flex-shrink: 0; }
+.profile-avatar-img { width: 56px; height: 56px; border-radius: 50%; object-fit: cover; border: 2px solid var(--border); flex-shrink: 0; }
+.profile-location { font-size: 13px !important; color: var(--primary) !important; font-weight: 600; margin-bottom: 4px !important; }
 .profile-header h3 { font-size: 16px; font-weight: 700; color: var(--text); margin-bottom: 4px; }
 .profile-header p { font-size: 13px; color: var(--text-muted); margin-bottom: 6px; }
 .profile-status { display: inline-block; padding: 2px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; text-transform: capitalize; }
@@ -436,6 +473,67 @@ export default {
 .profile-status.rejected { background: #fef2f2; color: #991b1b; }
 
 .profile-section { display: flex; flex-direction: column; gap: 4px; }
+
+/* Visual updates for profile detail cards */
+.profile-section-card {
+  padding: 14px;
+  background: var(--bg);
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.profile-section-card h4 {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 4px;
+}
+.section-text {
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--text);
+}
+.edu-timeline {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  position: relative;
+  padding-left: 8px;
+}
+.edu-timeline-item {
+  display: flex;
+  gap: 12px;
+}
+.timeline-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--primary);
+  margin-top: 5px;
+  flex-shrink: 0;
+}
+.timeline-content {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.timeline-content h5 {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+}
+.edu-level-badge {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--primary);
+  text-transform: uppercase;
+}
+.edu-duration {
+  font-size: 11px;
+  color: var(--text-muted);
+}
 .profile-section h4 { font-size: 12px; font-weight: 700; margin-bottom: 2px; }
 
 /* Rule Labels */

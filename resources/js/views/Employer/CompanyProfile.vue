@@ -33,6 +33,23 @@
             Company Information
           </h2>
 
+          <!-- Company Logo Upload -->
+          <div class="logo-upload-container">
+            <div class="logo-preview-wrapper" @click="$refs.logoInput.click()">
+              <img v-if="logoPreview" :src="logoPreview" class="company-logo-preview" />
+              <img v-else-if="form.logo_path" :src="'/storage/' + form.logo_path" class="company-logo-preview" />
+              <div v-else class="company-logo-placeholder">
+                <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                <span>Upload Logo</span>
+              </div>
+              <div class="logo-hover-overlay">
+                <span>Change Logo</span>
+              </div>
+            </div>
+            <input type="file" ref="logoInput" @change="handleLogoUpload" accept="image/*" style="display: none;" />
+            <div class="logo-upload-hint">Click logo to upload/change image</div>
+          </div>
+
           <div class="form-group">
             <label>Person In Charge Name</label>
             <input v-model="form.name" type="text"
@@ -85,6 +102,13 @@
             <textarea v-model="form.company_address"
               placeholder="Enter company address"
               class="form-input textarea"></textarea>
+          </div>
+
+          <div class="form-group">
+            <label>About Us</label>
+            <textarea v-model="form.about_us" rows="4"
+              placeholder="Tell candidates about your company history, culture, and core mission..."
+              class="form-input textarea-input"></textarea>
           </div>
 
           <div class="form-group">
@@ -236,8 +260,12 @@ export default {
         tech_support: [],
         work_arrangement: [],
         sensory_support: [],
-        status: 'pending'
+        status: 'pending',
+        logo_path: '',
+        logo: null,
+        about_us: ''
       },
+      logoPreview: null,
       stats: {
         totalJobs: 0,
         openJobs: 0,
@@ -288,6 +316,8 @@ export default {
           this.form.industry_type = p.industry_type || ''
           this.form.company_address = p.company_address || ''
           this.form.status = p.status || 'pending'
+          this.form.logo_path = p.logo_path || ''
+          this.form.about_us = p.about_us || ''
 
           // Load existing accessibility into 4 categories
           const allAcc = p.accessibility || []
@@ -310,6 +340,17 @@ export default {
         console.log('Profile not loaded')
       }
     },
+    handleLogoUpload(event) {
+      const file = event.target.files[0]
+      this.form.logo = file
+      if (file) {
+        const reader = new FileReader()
+        reader.onload = (e) => {
+          this.logoPreview = e.target.result
+        }
+        reader.readAsDataURL(file)
+      }
+    },
     async saveProfile() {
       this.loading = true
       this.success = ''
@@ -323,17 +364,27 @@ export default {
           ...this.form.sensory_support
         ]
 
-        await axios.post('/api/employer/profile', {
-          name: this.form.name,
-          company_name: this.form.company_name,
-          company_email: this.form.company_email,
-          contact_number: this.form.contact_number,
-          ssm_number: this.form.ssm_number,
-          industry_type: this.form.industry_type,
-          company_address: this.form.company_address,
-          accessibility: combinedAccessibility,
+        const formData = new FormData()
+        formData.append('name', this.form.name)
+        formData.append('company_name', this.form.company_name)
+        formData.append('company_email', this.form.company_email)
+        formData.append('contact_number', this.form.contact_number)
+        formData.append('ssm_number', this.form.ssm_number)
+        formData.append('industry_type', this.form.industry_type)
+        formData.append('company_address', this.form.company_address)
+        formData.append('accessibility', JSON.stringify(combinedAccessibility))
+        formData.append('about_us', this.form.about_us || '')
+
+        if (this.form.logo) {
+          formData.append('logo', this.form.logo)
+        }
+
+        await axios.post('/api/employer/profile', formData, {
+          headers: { 'Content-Type': 'multipart/form-data' }
         })
         this.success = 'Profile saved successfully!'
+        this.logoPreview = null
+        this.loadProfile()
       } catch (err) {
         this.error = 'Failed to save profile. Please try again.'
       }
@@ -431,5 +482,71 @@ export default {
 }
 .animate-spin {
   animation: spin 1s linear infinite;
+}
+
+/* Company Logo upload styles */
+.logo-upload-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 24px;
+  gap: 8px;
+}
+.logo-preview-wrapper {
+  width: 120px;
+  height: 120px;
+  border-radius: 12px;
+  border: 2px dashed var(--border);
+  overflow: hidden;
+  position: relative;
+  cursor: pointer;
+  background: var(--bg);
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.logo-preview-wrapper:hover {
+  border-color: var(--primary);
+}
+.company-logo-preview {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.company-logo-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  color: var(--text-muted);
+  font-weight: 600;
+}
+.company-logo-placeholder svg {
+  color: var(--text-muted);
+}
+.logo-hover-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 700;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+.logo-preview-wrapper:hover .logo-hover-overlay {
+  opacity: 1;
+}
+.logo-upload-hint {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+.textarea-input {
+  resize: vertical;
 }
 </style>

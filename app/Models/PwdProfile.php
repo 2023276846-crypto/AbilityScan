@@ -12,7 +12,9 @@ class PwdProfile extends Model
     'user_id', 'full_name', 'oku_number', 'oku_card_path',
     'certificate_path', 'video_path', 'skills',
     'physical_needs', 'tech_needs', 'work_arrangement', 'sensory_needs',
-    'accessibility_needs', 'digital_portfolio_link', 'status'
+    'accessibility_needs', 'digital_portfolio_link', 'status',
+    'avatar_path', 'location', 'about_me', 'experience', 'education',
+    'certificates', 'videos'
 ];
 
 protected $casts = [
@@ -22,6 +24,9 @@ protected $casts = [
     'work_arrangement' => 'array',
     'sensory_needs' => 'array',
     'accessibility_needs' => 'array',
+    'education' => 'array',
+    'certificates' => 'array',
+    'videos' => 'array',
 ];
 
     public function user()

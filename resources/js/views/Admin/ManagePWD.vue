@@ -217,24 +217,31 @@
 
           <!-- Attachments -->
           <div class="modal-section"
-            v-if="selectedPWD.certificate_path || selectedPWD.video_path">
+            v-if="(selectedPWD.certificates && selectedPWD.certificates.length) || (selectedPWD.videos && selectedPWD.videos.length)">
             <div class="rule-label" style="display: flex; align-items: center; gap: 6px;">
               <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
               Attachments
             </div>
             <div class="attachments">
-              <a v-if="selectedPWD.certificate_path"
-                :href="'/storage/' + selectedPWD.certificate_path"
-                target="_blank" class="attachment-link" style="display: inline-flex; align-items: center; gap: 6px;">
-                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-                Certificate
-              </a>
-              <a v-if="selectedPWD.video_path"
-                :href="'/storage/' + selectedPWD.video_path"
-                target="_blank" class="attachment-link" style="display: inline-flex; align-items: center; gap: 6px;">
-                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 7l-7 5 7 5V7z"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg>
-                Video
-              </a>
+              <!-- Certificates -->
+              <template v-if="selectedPWD.certificates && selectedPWD.certificates.length">
+                <a v-for="(cert, idx) in selectedPWD.certificates" :key="'c-' + idx"
+                  :href="'/storage/' + cert.path"
+                  target="_blank" class="attachment-link" style="display: inline-flex; align-items: center; gap: 6px;">
+                  <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                  {{ cert.name || 'Certificate ' + (idx + 1) }}
+                </a>
+              </template>
+              
+              <!-- Videos -->
+              <template v-if="selectedPWD.videos && selectedPWD.videos.length">
+                <a v-for="(vid, idx) in selectedPWD.videos" :key="'v-' + idx"
+                  :href="'/storage/' + vid.path"
+                  target="_blank" class="attachment-link" style="display: inline-flex; align-items: center; gap: 6px;">
+                  <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 7l-7 5 7 5V7z"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg>
+                  {{ vid.name || 'Skills Video ' + (idx + 1) }}
+                </a>
+              </template>
             </div>
           </div>
 

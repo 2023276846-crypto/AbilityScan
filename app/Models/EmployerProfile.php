@@ -11,7 +11,8 @@ class EmployerProfile extends Model
     protected $fillable = [
         'user_id', 'company_name', 'company_address',
         'industry_type', 'ssm_number', 'contact_number',
-        'company_email', 'accessibility', 'status'
+        'company_email', 'accessibility', 'status',
+        'logo_path', 'about_us'
     ];
 
     protected $casts = [

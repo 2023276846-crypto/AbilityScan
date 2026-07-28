@@ -60,14 +60,43 @@
           <div class="portfolio-preview">
             <!-- Header -->
             <div class="preview-header">
-              <div class="preview-avatar">{{ initials }}</div>
+              <img v-if="profile.avatar_path" :src="'/storage/' + profile.avatar_path" class="preview-avatar-img" />
+              <div v-else class="preview-avatar">{{ initials }}</div>
               <div>
                 <h3>{{ profile.full_name || 'Your Name' }}</h3>
+                <p v-if="profile.location" class="preview-location">📍 {{ profile.location }}</p>
                 <p>OKU No: {{ profile.oku_number || 'Not set' }}</p>
                 <div :class="['preview-status', profile.status || 'pending']">
                   {{ profile.status || 'pending' }}
                 </div>
               </div>
+            </div>
+
+            <!-- About Me Section -->
+            <div v-if="profile.about_me" class="preview-section-about">
+              <h4 class="about-label">About Me</h4>
+              <p class="about-text">{{ profile.about_me }}</p>
+            </div>
+
+            <!-- Education Timeline -->
+            <div v-if="profile.education && profile.education.length" class="preview-section-edu">
+              <h4 class="edu-label">🎓 Education Background</h4>
+              <div class="edu-timeline">
+                <div v-for="(edu, idx) in profile.education" :key="idx" class="edu-timeline-item">
+                  <div class="timeline-dot"></div>
+                  <div class="timeline-content">
+                    <span class="edu-level-badge">{{ edu.level }}</span>
+                    <h5>{{ edu.school_name }}</h5>
+                    <span class="edu-duration">{{ edu.years }}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Work Experience -->
+            <div v-if="profile.experience" class="preview-section-exp">
+              <h4 class="exp-label">💼 Work Experience</h4>
+              <p class="exp-text">{{ profile.experience }}</p>
             </div>
 
             <!-- S-Rule: Skills -->
@@ -127,6 +156,34 @@
                 <span v-if="!profile.sensory_needs?.length" class="no-data">
                   None added
                 </span>
+              </div>
+            </div>
+
+            <!-- Attachments -->
+            <div class="preview-section-attachments"
+              v-if="(profile.certificates && profile.certificates.length) || (profile.videos && profile.videos.length)">
+              <h4 class="attachments-label">📎 Attachments</h4>
+              
+              <!-- Certificates -->
+              <div v-if="profile.certificates && profile.certificates.length" class="attachment-group-preview">
+                <p class="attachment-group-title">Certificates:</p>
+                <div class="attachment-links-grid">
+                  <a v-for="(cert, idx) in profile.certificates" :key="idx"
+                    :href="'/storage/' + cert.path" target="_blank" class="attachment-preview-link">
+                    📄 {{ cert.name || 'Certificate ' + (idx + 1) }}
+                  </a>
+                </div>
+              </div>
+
+              <!-- Videos -->
+              <div v-if="profile.videos && profile.videos.length" class="attachment-group-preview" style="margin-top: 10px;">
+                <p class="attachment-group-title">Skills Videos:</p>
+                <div class="attachment-links-grid">
+                  <a v-for="(vid, idx) in profile.videos" :key="idx"
+                    :href="'/storage/' + vid.path" target="_blank" class="attachment-preview-link">
+                    🎥 {{ vid.name || 'Video ' + (idx + 1) }}
+                  </a>
+                </div>
               </div>
             </div>
 
@@ -331,6 +388,8 @@ export default {
 
 .preview-header { display: flex; align-items: center; gap: 16px; padding-bottom: 14px; border-bottom: 1px solid var(--border); }
 .preview-avatar { width: 56px; height: 56px; border-radius: 50%; background: var(--primary); color: white; display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: 700; flex-shrink: 0; }
+.preview-avatar-img { width: 56px; height: 56px; border-radius: 50%; object-fit: cover; border: 2px solid var(--border); flex-shrink: 0; }
+.preview-location { font-size: 13px !important; color: var(--primary) !important; font-weight: 600; margin-bottom: 4px !important; }
 .preview-header h3 { font-size: 16px; font-weight: 700; color: var(--text); margin-bottom: 4px; }
 .preview-header p { font-size: 13px; color: var(--text-muted); margin-bottom: 6px; }
 
@@ -341,6 +400,65 @@ export default {
 
 .preview-section { display: flex; flex-direction: column; gap: 6px; }
 .preview-section h4 { font-size: 12px; font-weight: 700; margin-bottom: 2px; }
+
+/* New preview sections */
+.preview-section-about, .preview-section-exp, .preview-section-edu {
+  padding: 12px;
+  background: var(--bg);
+  border-radius: 12px;
+  border: 1px solid var(--border);
+}
+.about-label, .exp-label, .edu-label {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 8px;
+}
+.about-text, .exp-text {
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--text);
+}
+.edu-timeline {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  position: relative;
+  padding-left: 12px;
+}
+.edu-timeline-item {
+  display: flex;
+  gap: 12px;
+  position: relative;
+}
+.timeline-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--primary);
+  margin-top: 5px;
+  flex-shrink: 0;
+}
+.timeline-content {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.timeline-content h5 {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+}
+.edu-level-badge {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--primary);
+  text-transform: uppercase;
+}
+.edu-duration {
+  font-size: 11px;
+  color: var(--text-muted);
+}
 
 /* Rule Labels */
 .s-label { color: #1d4ed8; }
@@ -369,5 +487,55 @@ export default {
   .sidebar { display: none; }
   .main-content { margin-left: 0; }
   .content-grid { grid-template-columns: 1fr; }
+}
+
+/* Attachments preview styling */
+.preview-section-attachments {
+  padding: 12px;
+  background: var(--bg);
+  border-radius: 12px;
+  border: 1px solid var(--border);
+}
+.attachments-label {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 8px;
+}
+.attachment-group-preview {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.attachment-group-title {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-muted);
+}
+.attachment-links-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.attachment-preview-link {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--primary);
+  text-decoration: none;
+  font-size: 12px;
+  font-weight: 600;
+  transition: all 0.2s;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+}
+.attachment-preview-link:hover {
+  background: var(--primary-light);
+  border-color: var(--primary);
 }
 </style>

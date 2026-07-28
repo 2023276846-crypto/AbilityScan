@@ -16,66 +16,197 @@
       </div>
 
       <div class="content-grid">
+        <!-- Left Column -->
+        <div class="left-column">
+          <!-- Left: Personal Info -->
+          <div class="card">
+            <h2>Personal Information</h2>
 
-        <!-- Left: Personal Info -->
-        <div class="card">
-          <h2>Personal Information</h2>
+            <!-- Profile Picture Upload -->
+            <div class="avatar-upload-section">
+              <div class="avatar-preview-container">
+                <img v-if="avatarPreview" :src="avatarPreview" class="avatar-preview-img" />
+                <img v-else-if="form.avatar_path" :src="'/storage/' + form.avatar_path" class="avatar-preview-img" />
+                <div v-else class="avatar-placeholder-text">
+                  <span>👤</span>
+                </div>
+              </div>
+              <div class="avatar-upload-controls">
+                <label class="btn-upload-avatar">
+                  Choose Photo
+                  <input type="file" @change="handleProfilePicture" accept="image/*" style="display: none;" />
+                </label>
+                <p class="file-hint">JPG or PNG (circular crop)</p>
+              </div>
+            </div>
 
-          <div class="form-group">
-            <label>Full Name</label>
-            <input v-model="form.full_name" type="text"
-              placeholder="Enter full name" class="form-input"/>
-          </div>
+            <div class="form-group">
+              <label>Full Name</label>
+              <input v-model="form.full_name" type="text"
+                placeholder="Enter full name" class="form-input"/>
+            </div>
 
-          <div class="form-group">
-            <label>OKU Number</label>
-            <input v-model="form.oku_number" type="text"
-              placeholder="Enter OKU number" class="form-input"/>
-          </div>
+            <div class="form-group">
+              <label>OKU Number</label>
+              <input v-model="form.oku_number" type="text"
+                placeholder="Enter OKU number" class="form-input"/>
+            </div>
 
-          <div class="form-group">
-            <label>Email</label>
-            <input v-model="form.email" type="email"
-              placeholder="Enter email" class="form-input" disabled/>
-          </div>
+            <div class="form-group">
+              <label>Email</label>
+              <input v-model="form.email" type="email"
+                placeholder="Enter email" class="form-input" disabled/>
+            </div>
 
-          <div class="form-group">
-            <label>Upload OKU Card</label>
-            <input type="file" @change="handleFile"
-              accept="image/*,.pdf" class="form-input file-input"/>
-            <div v-if="form.oku_card_path" class="file-status">
-              OKU Card uploaded
-              <a :href="'/storage/' + form.oku_card_path" target="_blank" class="view-link">View</a>
+            <div class="form-group">
+              <label>Location (City, State)</label>
+              <input v-model="form.location" type="text"
+                placeholder="e.g. Kuala Lumpur, Wilayah Persekutuan" class="form-input"/>
+            </div>
+
+            <div class="form-group">
+              <label>About Me</label>
+              <textarea v-model="form.about_me" rows="3"
+                placeholder="Write a brief professional summary about yourself..." class="form-input textarea-input"></textarea>
+            </div>
+
+            <div class="form-group">
+              <label>Upload OKU Card</label>
+              <input type="file" @change="handleFile"
+                accept="image/*,.pdf" class="form-input file-input"/>
+              <div v-if="form.oku_card_path" class="file-status">
+                OKU Card uploaded
+                <a :href="'/storage/' + form.oku_card_path" target="_blank" class="view-link">View</a>
+              </div>
+            </div>
+
+            <!-- Certificates Section -->
+            <div class="form-group attachments-manager">
+              <label>Manage Certificates</label>
+              
+              <!-- Existing saved certificates -->
+              <div v-if="form.certificates && form.certificates.length" class="saved-attachments">
+                <div v-for="(cert, idx) in form.certificates" :key="idx" class="attachment-item-saved">
+                  <span class="attachment-name">📄 {{ cert.name || 'Certificate ' + (idx + 1) }}</span>
+                  <div class="attachment-actions">
+                    <a :href="'/storage/' + cert.path" target="_blank" class="view-link-btn">View</a>
+                    <button type="button" @click="deleteExistingCertificate(idx)" class="delete-attachment-btn">✕ Delete</button>
+                  </div>
+                </div>
+              </div>
+              <div v-else class="no-attachments-text">No certificates uploaded yet.</div>
+
+              <!-- Upload input for new certificates -->
+              <label class="custom-file-upload-label">
+                + Upload New Certificate(s)
+                <input type="file" @change="handleNewCertificates" multiple
+                  accept=".pdf,.jpg,.jpeg,.png" class="hidden-file-input"/>
+              </label>
+
+              <!-- Queue of new certificates -->
+              <div v-if="newCertificatesQueue.length" class="upload-queue">
+                <p class="queue-title">New certificates to upload ({{ newCertificatesQueue.length }}):</p>
+                <div v-for="(file, idx) in newCertificatesQueue" :key="idx" class="queue-item">
+                  <span>📎 {{ file.name }}</span>
+                  <button type="button" @click="removeFromCertQueue(idx)" class="remove-queue-btn">✕</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Skills Videos Section -->
+            <div class="form-group attachments-manager">
+              <label>Manage Skills Videos</label>
+
+              <!-- Existing saved videos -->
+              <div v-if="form.videos && form.videos.length" class="saved-attachments">
+                <div v-for="(vid, idx) in form.videos" :key="idx" class="attachment-item-saved">
+                  <span class="attachment-name">🎥 {{ vid.name || 'Skills Video ' + (idx + 1) }}</span>
+                  <div class="attachment-actions">
+                    <a :href="'/storage/' + vid.path" target="_blank" class="view-link-btn">View</a>
+                    <button type="button" @click="deleteExistingVideo(idx)" class="delete-attachment-btn">✕ Delete</button>
+                  </div>
+                </div>
+              </div>
+              <div v-else class="no-attachments-text">No skills videos uploaded yet.</div>
+
+              <!-- Upload input for new videos -->
+              <label class="custom-file-upload-label">
+                + Upload New Skills Video(s)
+                <input type="file" @change="handleNewVideos" multiple
+                  accept="video/mp4,video/avi,video/mov" class="hidden-file-input"/>
+              </label>
+
+              <!-- Queue of new videos -->
+              <div v-if="newVideosQueue.length" class="upload-queue">
+                <p class="queue-title">New videos to upload ({{ newVideosQueue.length }}):</p>
+                <div v-for="(file, idx) in newVideosQueue" :key="idx" class="queue-item">
+                  <span>📎 {{ file.name }}</span>
+                  <button type="button" @click="removeFromVidQueue(idx)" class="remove-queue-btn">✕</button>
+                </div>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label>Account Status</label>
+              <div :class="['status-badge', form.status]">
+                {{ form.status === 'pending' ? 'Pending Approval' :
+                   form.status === 'approved' ? 'Approved' : 'Rejected' }}
+              </div>
             </div>
           </div>
 
-          <div class="form-group">
-            <label>Upload Certificate</label>
-            <input type="file" @change="handleCertificate"
-              accept=".pdf,.jpg,.jpeg,.png" class="form-input file-input"/>
-            <p class="file-hint">Accepted format: PDF, JPG, PNG</p>
-            <div v-if="form.certificate_path" class="file-status">
-              Certificate uploaded
-              <a :href="'/storage/' + form.certificate_path" target="_blank" class="view-link">View</a>
-            </div>
-          </div>
+          <!-- Left Second Card: Career & Education Details -->
+          <div class="card margin-top-card">
+            <h2>Career & Education Details</h2>
 
-          <div class="form-group">
-            <label>Upload Skills Video</label>
-            <input type="file" @change="handleVideo"
-              accept="video/mp4,video/avi,video/mov" class="form-input file-input"/>
-            <p class="file-hint">Accepted format: MP4, AVI, MOV (max 50MB)</p>
-            <div v-if="form.video_path" class="file-status">
-              Video uploaded
-              <a :href="'/storage/' + form.video_path" target="_blank" class="view-link">View</a>
+            <div class="form-group">
+              <label>Work Experience</label>
+              <textarea v-model="form.experience" rows="4"
+                placeholder="List your previous job roles, tasks, and years of experience..." class="form-input textarea-input"></textarea>
             </div>
-          </div>
 
-          <div class="form-group">
-            <label>Account Status</label>
-            <div :class="['status-badge', form.status]">
-              {{ form.status === 'pending' ? 'Pending Approval' :
-                 form.status === 'approved' ? 'Approved' : 'Rejected' }}
+            <!-- Dynamic Education Builder -->
+            <div class="education-builder">
+              <div class="section-title-row">
+                <label>Education History (Primary School until latest)</label>
+                <button type="button" @click="addEducation" class="btn-add-edu">+ Add Education</button>
+              </div>
+
+              <div v-if="!form.education || form.education.length === 0" class="empty-edu">
+                No education history added yet. Click "+ Add Education" to add.
+              </div>
+
+              <div v-else class="edu-items-list">
+                <div v-for="(edu, index) in form.education" :key="index" class="edu-item-form">
+                  <div class="edu-item-header">
+                    <span>Education / School #{{ index + 1 }}</span>
+                    <button type="button" @click="removeEducation(index)" class="btn-remove-edu">✕ Remove</button>
+                  </div>
+                  <div class="edu-grid">
+                    <div class="form-group">
+                      <label>Level</label>
+                      <select v-model="edu.level" class="form-input">
+                        <option value="" disabled>Select level</option>
+                        <option value="Primary School">Primary School</option>
+                        <option value="Secondary School">Secondary School</option>
+                        <option value="High School">High School</option>
+                        <option value="Diploma">Diploma</option>
+                        <option value="Bachelor's Degree">Bachelor's Degree</option>
+                        <option value="Master's Degree">Master's Degree</option>
+                        <option value="Other Certification">Other Certificate</option>
+                      </select>
+                    </div>
+                    <div class="form-group">
+                      <label>School / Institution Name</label>
+                      <input v-model="edu.school_name" type="text" placeholder="e.g. SK Subang Jaya" class="form-input" />
+                    </div>
+                    <div class="form-group">
+                      <label>Duration / Years</label>
+                      <input v-model="edu.years" type="text" placeholder="e.g. 2012 - 2017" class="form-input" />
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -208,8 +339,19 @@ export default {
         work_arrangement: [],
         sensory_needs: [],
         accessibility_needs: [],
-        status: 'pending'
+        status: 'pending',
+        avatar_path: '',
+        profile_picture: null,
+        location: '',
+        about_me: '',
+        experience: '',
+        education: [],
+        certificates: [],
+        videos: []
       },
+      avatarPreview: null,
+      newCertificatesQueue: [],
+      newVideosQueue: [],
       skillOptions: [
         'Microsoft Office', 'Data Entry', 'Customer Service',
         'Graphic Design', 'Web Development', 'Programming',
@@ -266,6 +408,11 @@ export default {
           this.form.sensory_needs = p.sensory_needs || []
           this.form.accessibility_needs = p.accessibility_needs || []
           this.form.status = p.status || 'pending'
+          this.form.avatar_path = p.avatar_path || ''
+          this.form.location = p.location || ''
+          this.form.about_me = p.about_me || ''
+          this.form.experience = p.experience || ''
+          this.form.education = p.education || []
         }
         if (response.data.user) {
           this.form.email = response.data.user.email
@@ -277,11 +424,49 @@ export default {
     handleFile(event) {
       this.form.oku_card = event.target.files[0]
     },
-    handleCertificate(event) {
-      this.form.certificate = event.target.files[0]
+    handleNewCertificates(event) {
+      const files = Array.from(event.target.files)
+      this.newCertificatesQueue.push(...files)
     },
-    handleVideo(event) {
-      this.form.video = event.target.files[0]
+    removeFromCertQueue(index) {
+      this.newCertificatesQueue.splice(index, 1)
+    },
+    deleteExistingCertificate(index) {
+      this.form.certificates.splice(index, 1)
+    },
+    handleNewVideos(event) {
+      const files = Array.from(event.target.files)
+      this.newVideosQueue.push(...files)
+    },
+    removeFromVidQueue(index) {
+      this.newVideosQueue.splice(index, 1)
+    },
+    deleteExistingVideo(index) {
+      this.form.videos.splice(index, 1)
+    },
+    handleProfilePicture(event) {
+      const file = event.target.files[0]
+      this.form.profile_picture = file
+      if (file) {
+        const reader = new FileReader()
+        reader.onload = (e) => {
+          this.avatarPreview = e.target.result
+        }
+        reader.readAsDataURL(file)
+      }
+    },
+    addEducation() {
+      if (!this.form.education) {
+        this.form.education = []
+      }
+      this.form.education.push({
+        level: '',
+        school_name: '',
+        years: ''
+      })
+    },
+    removeEducation(index) {
+      this.form.education.splice(index, 1)
     },
     async saveProfile() {
       this.loading = true
@@ -302,14 +487,32 @@ export default {
           ...this.form.work_arrangement,
           ...this.form.sensory_needs
         ]))
+        formData.append('location', this.form.location || '')
+        formData.append('about_me', this.form.about_me || '')
+        formData.append('experience', this.form.experience || '')
+        formData.append('education', JSON.stringify(this.form.education || []))
+        
+        formData.append('existing_certificates', JSON.stringify(this.form.certificates || []))
+        formData.append('existing_videos', JSON.stringify(this.form.videos || []))
+
+        // Append new files
+        this.newCertificatesQueue.forEach((file) => {
+          formData.append('new_certificates[]', file)
+        })
+        this.newVideosQueue.forEach((file) => {
+          formData.append('new_videos[]', file)
+        })
+
         if (this.form.oku_card) formData.append('oku_card', this.form.oku_card)
-        if (this.form.certificate) formData.append('certificate', this.form.certificate)
-        if (this.form.video) formData.append('video', this.form.video)
+        if (this.form.profile_picture) formData.append('profile_picture', this.form.profile_picture)
 
         await axios.post('/api/pwd/profile', formData, {
           headers: { 'Content-Type': 'multipart/form-data' }
         })
         this.success = 'Profile saved successfully!'
+        this.newCertificatesQueue = []
+        this.newVideosQueue = []
+        this.loadProfile()
       } catch (err) {
         this.error = 'Failed to save profile. Please try again.'
       }
@@ -569,9 +772,272 @@ export default {
 .btn-save:hover { background: var(--primary-hover); }
 .btn-save:disabled { opacity: 0.6; cursor: not-allowed; }
 
+/* Avatar Upload styling */
+.avatar-upload-section {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  margin-bottom: 24px;
+  padding-bottom: 20px;
+  border-bottom: 1px dashed var(--border);
+}
+.avatar-preview-container {
+  width: 90px;
+  height: 90px;
+  border-radius: 50%;
+  border: 3px solid var(--border);
+  overflow: hidden;
+  background: var(--bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+.avatar-preview-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.avatar-placeholder-text {
+  font-size: 36px;
+  color: var(--text-muted);
+}
+.avatar-upload-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.btn-upload-avatar {
+  background: var(--primary);
+  color: white;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  border: none;
+  width: max-content;
+}
+.btn-upload-avatar:hover {
+  background: var(--primary-hover);
+}
+
+.textarea-input {
+  resize: vertical;
+  min-height: 100px;
+}
+
+.margin-top-card {
+  margin-top: 24px;
+}
+
+.left-column {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Education Builder styles */
+.education-builder {
+  margin-top: 24px;
+  border-top: 1px solid var(--border);
+  padding-top: 20px;
+}
+.section-title-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+.section-title-row label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 0 !important;
+}
+.btn-add-edu {
+  padding: 6px 12px;
+  background: var(--primary-light);
+  color: var(--primary);
+  border: 1px solid var(--primary);
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.btn-add-edu:hover {
+  background: var(--primary);
+  color: white;
+}
+.empty-edu {
+  padding: 20px;
+  text-align: center;
+  border: 2px dashed var(--border);
+  border-radius: 8px;
+  font-size: 13px;
+  color: var(--text-muted);
+  background: var(--bg);
+}
+.edu-items-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.edu-item-form {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 16px;
+  background: var(--bg);
+}
+.edu-item-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-muted);
+  margin-bottom: 12px;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 8px;
+}
+.btn-remove-edu {
+  background: none;
+  border: none;
+  color: #ef4444;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.btn-remove-edu:hover {
+  text-decoration: underline;
+}
+.edu-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 120px;
+  gap: 12px;
+}
+
 @media (max-width: 768px) {
   .sidebar { display: none; }
   .main-content { margin-left: 0; }
   .content-grid { grid-template-columns: 1fr; }
+  .edu-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Multiple attachments manager styles */
+.attachments-manager {
+  border-top: 1px solid var(--border);
+  padding-top: 16px;
+  margin-top: 16px;
+}
+.saved-attachments {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+.attachment-item-saved {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 12px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
+.attachment-name {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text);
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+  max-width: 70%;
+}
+.attachment-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.view-link-btn {
+  font-size: 12px;
+  color: var(--primary);
+  text-decoration: underline;
+  cursor: pointer;
+}
+.delete-attachment-btn {
+  background: none;
+  border: none;
+  color: #ef4444;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.delete-attachment-btn:hover {
+  text-decoration: underline;
+}
+.no-attachments-text {
+  font-size: 12px;
+  color: var(--text-muted);
+  font-style: italic;
+  margin-bottom: 12px;
+}
+.custom-file-upload-label {
+  display: inline-block;
+  padding: 8px 16px;
+  background: var(--bg);
+  border: 1px dashed var(--primary);
+  color: var(--primary);
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-align: center;
+  width: max-content;
+}
+.custom-file-upload-label:hover {
+  background: var(--primary-light);
+}
+.hidden-file-input {
+  display: none;
+}
+.upload-queue {
+  margin-top: 12px;
+  padding: 8px 12px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
+.queue-title {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-muted);
+  margin-bottom: 6px;
+}
+.queue-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 12px;
+  color: var(--text);
+  padding: 4px 0;
+  border-bottom: 1px solid var(--border);
+}
+.queue-item:last-child {
+  border-bottom: none;
+}
+.remove-queue-btn {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-size: 12px;
+  cursor: pointer;
+}
+.remove-queue-btn:hover {
+  color: #ef4444;
 }
 </style>
