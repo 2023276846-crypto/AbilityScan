@@ -1,0 +1,323 @@
+{
+  "_AppNavbar-!~{00o}~.js": {
+    "file": "assets/AppNavbar-Cvg0I4Li.css",
+    "src": "_AppNavbar-!~{00o}~.js"
+  },
+  "_AppNavbar-CEmOhYjV.js": {
+    "file": "assets/AppNavbar-CEmOhYjV.js",
+    "name": "AppNavbar",
+    "imports": [
+      "resources/js/app.js"
+    ],
+    "css": [
+      "assets/AppNavbar-Cvg0I4Li.css"
+    ]
+  },
+  "_chart-BR_H7_9u.js": {
+    "file": "assets/chart-BR_H7_9u.js",
+    "name": "chart"
+  },
+  "resources/js/app.js": {
+    "file": "assets/app-CM9GmHKt.js",
+    "name": "app",
+    "src": "resources/js/app.js",
+    "isEntry": true,
+    "dynamicImports": [
+      "resources/js/views/Homepage.vue",
+      "resources/js/views/LoginPage.vue",
+      "resources/js/views/RegisterPWD.vue",
+      "resources/js/views/RegisterEmployer.vue",
+      "resources/js/views/PWD/PWDDashboard.vue",
+      "resources/js/views/PWD/ManageProfile.vue",
+      "resources/js/views/PWD/QRPortfolio.vue",
+      "resources/js/views/PWD/SearchJob.vue",
+      "resources/js/views/PWD/MatchExplanation.vue",
+      "resources/js/views/PWD/PWDMailbox.vue",
+      "resources/js/views/Employer/EmployerDashboard.vue",
+      "resources/js/views/Employer/PostJob.vue",
+      "resources/js/views/Employer/EditJob.vue",
+      "resources/js/views/Employer/CompanyProfile.vue",
+      "resources/js/views/Employer/ScanQR.vue",
+      "resources/js/views/Employer/SearchCandidates.vue",
+      "resources/js/views/Employer/EmployerMailbox.vue",
+      "resources/js/views/Admin/AdminDashboard.vue",
+      "resources/js/views/Admin/ManagePWD.vue",
+      "resources/js/views/Admin/ManageEmployer.vue",
+      "resources/js/views/Admin/GenerateReports.vue",
+      "resources/js/views/Admin/MonitorPerformance.vue"
+    ],
+    "css": [
+      "assets/app-D_WvsCAy.css"
+    ]
+  },
+  "resources/js/views/Admin/AdminDashboard.vue": {
+    "file": "assets/AdminDashboard-DHOg8nUZ.js",
+    "name": "AdminDashboard",
+    "src": "resources/js/views/Admin/AdminDashboard.vue",
+    "isDynamicEntry": true,
+    "imports": [
+      "resources/js/app.js"
+    ],
+    "css": [
+      "assets/AdminDashboard-Drg8N0o1.css"
+    ]
+  },
+  "resources/js/views/Admin/GenerateReports.vue": {
+    "file": "assets/GenerateReports-cjK3iMkl.js",
+    "name": "GenerateReports",
+    "src": "resources/js/views/Admin/GenerateReports.vue",
+    "isDynamicEntry": true,
+    "imports": [
+      "resources/js/app.js",
+      "_chart-BR_H7_9u.js"
+    ],
+    "css": [
+      "assets/GenerateReports-CE-aDAOe.css"
+    ]
+  },
+  "resources/js/views/Admin/ManageEmployer.vue": {
+    "file": "assets/ManageEmployer-CDvY03I0.js",
+    "name": "ManageEmployer",
+    "src": "resources/js/views/Admin/ManageEmployer.vue",
+    "isDynamicEntry": true,
+    "imports": [
+      "resources/js/app.js"
+    ],
+    "css": [
+      "assets/ManageEmployer-B6yPs67w.css"
+    ]
+  },
+  "resources/js/views/Admin/ManagePWD.vue": {
+    "file": "assets/ManagePWD-BR0l-L1-.js",
+    "name": "ManagePWD",
+    "src": "resources/js/views/Admin/ManagePWD.vue",
+    "isDynamicEntry": true,
+    "imports": [
+      "resources/js/app.js"
+    ],
+    "css": [
+      "assets/ManagePWD-BCA9lbtV.css"
+    ]
+  },
+  "resources/js/views/Admin/MonitorPerformance.vue": {
+    "file": "assets/MonitorPerformance-B8dvW3iu.js",
+    "name": "MonitorPerformance",
+    "src": "resources/js/views/Admin/MonitorPerformance.vue",
+    "isDynamicEntry": true,
+    "imports": [
+      "resources/js/app.js",
+      "_chart-BR_H7_9u.js"
+    ],
+    "css": [
+      "assets/MonitorPerformance-BaFBDcv8.css"
+    ]
+  },
+  "resources/js/views/Employer/CompanyProfile.vue": {
+    "file": "assets/CompanyProfile-B63h44MR.js",
+    "name": "CompanyProfile",
+    "src": "resources/js/views/Employer/CompanyProfile.vue",
+    "isDynamicEntry": true,
+    "imports": [
+      "resources/js/app.js"
+    ],
+    "css": [
+      "assets/CompanyProfile-PehxRlrB.css"
+    ]
+  },
+  "resources/js/views/Employer/EditJob.vue": {
+    "file": "assets/EditJob-aXJx88Oh.js",
+    "name": "EditJob",
+    "src": "resources/js/views/Employer/EditJob.vue",
+    "isDynamicEntry": true,
+    "imports": [
+      "resources/js/app.js"
+    ],
+    "css": [
+      "assets/EditJob-DHofZSVs.css"
+    ]
+  },
+  "resources/js/views/Employer/EmployerDashboard.vue": {
+    "file": "assets/EmployerDashboard-uzgetVfL.js",
+    "name": "EmployerDashboard",
+    "src": "resources/js/views/Employer/EmployerDashboard.vue",
+    "isDynamicEntry": true,
+    "imports": [
+      "resources/js/app.js"
+    ],
+    "css": [
+      "assets/EmployerDashboard-B8-DGbfv.css"
+    ]
+  },
+  "resources/js/views/Employer/EmployerMailbox.vue": {
+    "file": "assets/EmployerMailbox-NA4t0Ned.js",
+    "name": "EmployerMailbox",
+    "src": "resources/js/views/Employer/EmployerMailbox.vue",
+    "isDynamicEntry": true,
+    "imports": [
+      "resources/js/app.js"
+    ],
+    "css": [
+      "assets/EmployerMailbox-DNeoJyHh.css"
+    ]
+  },
+  "resources/js/views/Employer/PostJob.vue": {
+    "file": "assets/PostJob-PDyY8EiR.js",
+    "name": "PostJob",
+    "src": "resources/js/views/Employer/PostJob.vue",
+    "isDynamicEntry": true,
+    "imports": [
+      "resources/js/app.js"
+    ],
+    "css": [
+      "assets/PostJob-CrRWuBqt.css"
+    ]
+  },
+  "resources/js/views/Employer/ScanQR.vue": {
+    "file": "assets/ScanQR-pYbdbZQ6.js",
+    "name": "ScanQR",
+    "src": "resources/js/views/Employer/ScanQR.vue",
+    "isDynamicEntry": true,
+    "imports": [
+      "resources/js/app.js"
+    ],
+    "css": [
+      "assets/ScanQR-Bk1LvPRj.css"
+    ]
+  },
+  "resources/js/views/Employer/SearchCandidates.vue": {
+    "file": "assets/SearchCandidates-BRdB9UrK.js",
+    "name": "SearchCandidates",
+    "src": "resources/js/views/Employer/SearchCandidates.vue",
+    "isDynamicEntry": true,
+    "imports": [
+      "resources/js/app.js"
+    ],
+    "css": [
+      "assets/SearchCandidates-Cbd9uQef.css"
+    ]
+  },
+  "resources/js/views/Homepage.vue": {
+    "file": "assets/Homepage-Rh5X1fZ0.js",
+    "name": "Homepage",
+    "src": "resources/js/views/Homepage.vue",
+    "isDynamicEntry": true,
+    "imports": [
+      "_AppNavbar-CEmOhYjV.js",
+      "resources/js/app.js"
+    ],
+    "css": [
+      "assets/Homepage-Cj1swvjB.css"
+    ]
+  },
+  "resources/js/views/LoginPage.vue": {
+    "file": "assets/LoginPage-cCK4edxx.js",
+    "name": "LoginPage",
+    "src": "resources/js/views/LoginPage.vue",
+    "isDynamicEntry": true,
+    "imports": [
+      "resources/js/app.js",
+      "_AppNavbar-CEmOhYjV.js"
+    ],
+    "css": [
+      "assets/LoginPage-DpDEJi9N.css"
+    ]
+  },
+  "resources/js/views/PWD/ManageProfile.vue": {
+    "file": "assets/ManageProfile-BdwpVbDm.js",
+    "name": "ManageProfile",
+    "src": "resources/js/views/PWD/ManageProfile.vue",
+    "isDynamicEntry": true,
+    "imports": [
+      "resources/js/app.js"
+    ],
+    "css": [
+      "assets/ManageProfile-BEEAM20U.css"
+    ]
+  },
+  "resources/js/views/PWD/MatchExplanation.vue": {
+    "file": "assets/MatchExplanation-BcRxXsNI.js",
+    "name": "MatchExplanation",
+    "src": "resources/js/views/PWD/MatchExplanation.vue",
+    "isDynamicEntry": true,
+    "imports": [
+      "resources/js/app.js"
+    ],
+    "css": [
+      "assets/MatchExplanation-BlF8aWQe.css"
+    ]
+  },
+  "resources/js/views/PWD/PWDDashboard.vue": {
+    "file": "assets/PWDDashboard-PLPnwoHv.js",
+    "name": "PWDDashboard",
+    "src": "resources/js/views/PWD/PWDDashboard.vue",
+    "isDynamicEntry": true,
+    "imports": [
+      "resources/js/app.js"
+    ],
+    "css": [
+      "assets/PWDDashboard-Z2ItVmxK.css"
+    ]
+  },
+  "resources/js/views/PWD/PWDMailbox.vue": {
+    "file": "assets/PWDMailbox-DLzBJ-mu.js",
+    "name": "PWDMailbox",
+    "src": "resources/js/views/PWD/PWDMailbox.vue",
+    "isDynamicEntry": true,
+    "imports": [
+      "resources/js/app.js"
+    ],
+    "css": [
+      "assets/PWDMailbox-BYYyhDIF.css"
+    ]
+  },
+  "resources/js/views/PWD/QRPortfolio.vue": {
+    "file": "assets/QRPortfolio-DvaVLSNH.js",
+    "name": "QRPortfolio",
+    "src": "resources/js/views/PWD/QRPortfolio.vue",
+    "isDynamicEntry": true,
+    "imports": [
+      "resources/js/app.js"
+    ],
+    "css": [
+      "assets/QRPortfolio-DsAIiMgc.css"
+    ]
+  },
+  "resources/js/views/PWD/SearchJob.vue": {
+    "file": "assets/SearchJob-SdHc6-pl.js",
+    "name": "SearchJob",
+    "src": "resources/js/views/PWD/SearchJob.vue",
+    "isDynamicEntry": true,
+    "imports": [
+      "resources/js/app.js"
+    ],
+    "css": [
+      "assets/SearchJob-Chu5ZOCJ.css"
+    ]
+  },
+  "resources/js/views/RegisterEmployer.vue": {
+    "file": "assets/RegisterEmployer-CtzTI0D9.js",
+    "name": "RegisterEmployer",
+    "src": "resources/js/views/RegisterEmployer.vue",
+    "isDynamicEntry": true,
+    "imports": [
+      "resources/js/app.js",
+      "_AppNavbar-CEmOhYjV.js"
+    ],
+    "css": [
+      "assets/RegisterEmployer-DAYDtigo.css"
+    ]
+  },
+  "resources/js/views/RegisterPWD.vue": {
+    "file": "assets/RegisterPWD-BYoXKKTB.js",
+    "name": "RegisterPWD",
+    "src": "resources/js/views/RegisterPWD.vue",
+    "isDynamicEntry": true,
+    "imports": [
+      "resources/js/app.js",
+      "_AppNavbar-CEmOhYjV.js"
+    ],
+    "css": [
+      "assets/RegisterPWD-Szw1PQw9.css"
+    ]
+  }
+}

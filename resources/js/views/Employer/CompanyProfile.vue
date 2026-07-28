@@ -445,7 +445,7 @@ export default {
         this.logoPreview = null
         this.loadProfile()
       } catch (err) {
-        this.error = 'Failed to save profile. Please try again.'
+        this.error = err.response?.data?.message || err.message || 'Failed to save profile. Please try again.'
       }
       this.loading = false
     },

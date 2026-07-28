@@ -404,7 +404,7 @@ export default {
 
 .table-name { display: flex; align-items: center; gap: 8px; font-weight: 600; }
 
-.table-avatar { width: 32px; height: 32px; border-radius: 50%; background: var(--primary); color: white; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; flex-shrink: 0; }
+.table-avatar { width: 32px; height: 32px; border-radius: 50%; background: var(--primary); color: white; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; flex-shrink: 0; overflow: hidden; -webkit-backface-visibility: hidden; -moz-backface-visibility: hidden; -webkit-transform: translate3d(0, 0, 0); -moz-transform: translate3d(0, 0, 0); }
 .table-avatar img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
 
 .tags { display: flex; flex-wrap: wrap; gap: 4px; }
